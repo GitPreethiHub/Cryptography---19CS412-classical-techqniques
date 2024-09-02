@@ -461,61 +461,83 @@ Testing algorithm with different key values.
 
 ## PROGRAM:
 ```
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-main()
-{
-int i,j,len,rails,count,code[100][1000];
- char str[1000];
- printf("Enter a Secret Message\n");
- gets(str);
- len=strlen(str);
-printf("Enter number of rails\n");
-scanf("%d",&rails);
-for(i=0;i<rails;i++)
-{
- for(j=0;j<len;j++)
- {
- code[i][j]=0;
- }
+#include <stdio.h>
+#include <string.h>
+
+void encryptRailFence(char *plainText, int key, char *cipherText) {
+    int len = strlen(plainText);
+    int rail[key][len];
+    memset(rail, 0, sizeof(rail));
+    int dir_down = 0, row = 0, col = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (row == 0 || row == key - 1) dir_down = !dir_down;
+        rail[row][col++] = plainText[i];
+        dir_down ? row++ : row--;
+    }
+
+    int index = 0;
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < len; j++)
+            if (rail[i][j] != 0)
+                cipherText[index++] = rail[i][j];
+
+    cipherText[index] = '\0';
 }
-count=0;
-j=0;
-while(j<len)
-{
-if(count%2==0)
-{
-for(i=0;i<rails;i++)
-{
- //strcpy(code[i][j],str[j]);
- code[i][j]=(int)str[j]; 
- j++;
+
+void decryptRailFence(char *cipherText, int key, char *plainText) {
+    int len = strlen(cipherText);
+    int rail[key][len];
+    memset(rail, 0, sizeof(rail));
+    int dir_down, row = 0, col = 0;
+
+    for (int i = 0; i < len; i++) {
+        if (row == 0) dir_down = 1;
+        if (row == key - 1) dir_down = 0;
+        rail[row][col++] = 1;
+        dir_down ? row++ : row--;
+    }
+
+    int index = 0;
+    for (int i = 0; i < key; i++)
+        for (int j = 0; j < len; j++)
+            if (rail[i][j] == 1 && index < len)
+                rail[i][j] = cipherText[index++];
+
+    dir_down = 0, row = 0, col = 0;
+    for (int i = 0; i < len; i++) {
+        if (row == 0) dir_down = 1;
+        if (row == key - 1) dir_down = 0;
+        if (rail[row][col] != 0) plainText[i] = rail[row][col++];
+        dir_down ? row++ : row--;
+    }
+
+    plainText[len] = '\0';
 }
+
+int main() {
+    char plainText[100], cipherText[100], decryptedText[100];
+    int key;
+
+    printf("Enter the plain text: ");
+    fgets(plainText, sizeof(plainText), stdin);
+    plainText[strcspn(plainText, "\n")] = '\0';
+
+    printf("Enter the key (number of rails): ");
+    scanf("%d", &key);
+
+    encryptRailFence(plainText, key, cipherText);
+    printf("Encrypted Text: %s\n", cipherText);
+
+    decryptRailFence(cipherText, key, decryptedText);
+    printf("Decrypted Text: %s\n", decryptedText);
+
+    return 0;
 }
-else
-{
-for(i=rails-2;i>0;i--)
-{
- code[i][j]=(int)str[j];
-j++;
-} 
-} 
-count++;
-}
-for(i=0;i<rails;i++)
-{
-for(j=0;j<len;j++)
-{
- if(code[i][j]!=0)
- printf("%c",code[i][j]);
-}
-}
-printf("\n");
-}
+
 ```
 ## OUTPUT:
-![Screenshot 2024-08-30 at 14-35-37 Online C Compiler - online editor](https://github.com/user-attachments/assets/829b97f5-957d-40d4-9ec5-5aa7f23228f8)
+![image](https://github.com/user-attachments/assets/e05c5af2-6e1e-4c58-a031-c4b82fcb994c)
 
 ## RESULT:
 The program is executed successfully
