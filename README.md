@@ -357,58 +357,67 @@ Testing algorithm with different key values.
 ```
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
-// Function to perform Vigenere encryption
-void vigenereEncrypt(char *text, const char *key) {
-    int textLen = strlen(text);
-    int keyLen = strlen(key);
+void vigenere_encrypt(const char *plaintext, const char *key, char *encrypted) {
+    int pt_len = strlen(plaintext);
+    int key_len = strlen(key);
+    int i, j;
 
-    for (int i = 0; i < textLen; i++) {
-        char c = text[i];
-        if (c >= 'A' && c <= 'Z') {
-            // Encrypt uppercase letters
-            text[i] = ((c - 'A' + key[i % keyLen] - 'A') % 26) + 'A';
-        } else if (c >= 'a' && c <= 'z') {
-            // Encrypt lowercase letters
-            text[i] = ((c - 'a' + key[i % keyLen] - 'A') % 26) + 'a';
+    for (i = 0, j = 0; i < pt_len; i++) {
+        if (isalpha(plaintext[i])) {
+            char pt_char = toupper(plaintext[i]);
+            char key_char = toupper(key[j % key_len]);
+            encrypted[i] = ((pt_char - 'A') + (key_char - 'A')) % 26 + 'A';
+            j++;
+        } else {
+            encrypted[i] = plaintext[i];
         }
     }
+    encrypted[pt_len] = '\0';
 }
 
-// Function to perform Vigenere decryption
-void vigenereDecrypt(char *text, const char *key) {
-    int textLen = strlen(text);
-    int keyLen = strlen(key);
+void vigenere_decrypt(const char *encrypted, const char *key, char *decrypted) {
+    int enc_len = strlen(encrypted);
+    int key_len = strlen(key);
+    int i, j;
 
-    for (int i = 0; i < textLen; i++) {
-        char c = text[i];
-        if (c >= 'A' && c <= 'Z') {
-            // Decrypt uppercase letters
-            text[i] = ((c - 'A' - (key[i % keyLen] - 'A') + 26) % 26) + 'A';
-        } else if (c >= 'a' && c <= 'z') {
-            // Decrypt lowercase letters
-            text[i] = ((c - 'a' - (key[i % keyLen] - 'A') + 26) % 26) + 'a';
+    for (i = 0, j = 0; i < enc_len; i++) {
+        if (isalpha(encrypted[i])) {
+            char enc_char = toupper(encrypted[i]);
+            char key_char = toupper(key[j % key_len]);
+            decrypted[i] = ((enc_char - 'A') - (key_char - 'A') + 26) % 26 + 'A';
+            j++;
+        } else {
+            decrypted[i] = encrypted[i];
         }
     }
+    decrypted[enc_len] = '\0';
 }
 
 int main() {
-    const char *key = "KEY";  // Replace with your desired key
-    char message[] = "This is a secret message.";  // Replace with your message
+    char plaintext[1000], key[1000], encrypted[1000], decrypted[1000];
 
-    // Encrypt the message
-    vigenereEncrypt(message, key);
-    printf("Encrypted Message: %s\n", message);
+    printf("Enter the plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0';
 
-    // Decrypt the message back to the original
-    vigenereDecrypt(message, key);
-    printf("Decrypted Message: %s\n", message);
+    printf("Enter the key: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = '\0';
+
+    vigenere_encrypt(plaintext, key, encrypted);
+    printf("Encrypted message: %s\n", encrypted);
+
+    vigenere_decrypt(encrypted, key, decrypted);
+    printf("Decoded message: %s\n", decrypted);
 
     return 0;
 }
+
 ```
 ## OUTPUT:
-![Screenshot 2024-08-30 at 14-24-43 Online C Compiler - Programiz](https://github.com/user-attachments/assets/30296f10-323e-412e-9184-03790ac25c00)
+![image](https://github.com/user-attachments/assets/53a3d8c9-de62-447b-9814-7f79d778c02e)
 
 ## RESULT:
 The program is executed successfully
